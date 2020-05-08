@@ -30,4 +30,4 @@ def updateCamera():
 updateCamera()
 
 if __name__ == '__main__':
-    socketio.run(app, debug=False, log_output=False)
+    socketio.run(app, debug=False, log_output=False, host='0.0.0.0')
