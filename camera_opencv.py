@@ -27,7 +27,7 @@ class Camera(BaseCamera):
             # read current frame
             _, img = camera.read()
 
-            img = cv2.resize(img, (320, 180))
+            img = cv2.resize(img, (256, 144))
 
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             # Detect the faces
