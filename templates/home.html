@@ -20,11 +20,13 @@
 
 			socket.on('imageUpdate', function(data) {
 				let imageData = data.image_data
+				let delay = data.delay
 
 				let bytes = new Uint8Array(imageData)
 				let convertedData = "data:image/jpeg;base64,"+encode(bytes)
 
 				// console.log(convertedData)
+				console.log(delay + " ms")
 
 				const imageElement = document.getElementById('image')
         imageElement.src = convertedData

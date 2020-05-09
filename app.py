@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 from importlib import import_module
-import os
 from flask import Flask, render_template, Response, send_from_directory
-import threading
-import cv2
 from camera_opencv import Camera
 from flask_socketio import SocketIO
 from flask_socketio import send, emit
+import os
+import threading
+import cv2
+import time
 
 app = Flask(__name__)
 socketio = SocketIO(app, async_mode="threading")
@@ -20,16 +21,40 @@ def index():
 
 @socketio.on('connect')
 def connect():
-	emit('after connect',  {'data':'connected to server'})
+	files = getListOfFiles()
+	emit('after connect',  {'files':files})
 
 @app.route('/saved/<path:filepath>')
 def saved(filepath):
 	return send_from_directory('saved', filepath)
 
+def getListOfFiles():
+	dirName = os.getcwd() + '/saved/'
+	listOfFile = os.listdir(dirName)
+	allFiles = list()
+
+	for entry in listOfFile:
+		allFiles.append(entry)
+
+	try:
+		allFiles.remove('.gitkeep')
+	except:
+		print('something went wrong with removing .gitkeep')
+
+	try:
+		allFiles.remove('.DS_Store')
+	except:
+		print('something went wrong with removing .DS_Store')
+
+	            
+	return allFiles
+
 def updateCamera():
-	threading.Timer(1.0/FPS, updateCamera).start()
+	initTime = time.time() * 1000
 	frame = camera.get_frame()
-	socketio.emit('imageUpdate', {'image_data':frame})
+	delay = time.time()*1000 - initTime
+	socketio.emit('imageUpdate', {'image_data':frame, 'delay':delay})
+	threading.Timer(1.0/FPS+(delay/1000), updateCamera).start()
 
 updateCamera()
 
