@@ -1,12 +1,14 @@
 import os
 import cv2
 import time
+import datetime
 from base_camera import BaseCamera
 
 
 class Camera(BaseCamera):
     video_source = 0
     savedImagePath = os.getcwd() + '/saved/'
+    font = cv2.FONT_HERSHEY_SIMPLEX
 
     def __init__(self):
         if os.environ.get('OPENCV_CAMERA_SOURCE'):
@@ -33,6 +35,10 @@ class Camera(BaseCamera):
                 img = cv2.resize(img, (256, 144))
 
                 imgName = str(round(time.time()))
+
+                currentDT = datetime.datetime.now()
+
+                cv2.putText(img,currentDT.strftime("%Y-%m-%d %H:%M:%S"),(10,20), Camera.font, 0.5,(255,255,255),2)
 
                 # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
                 # Detect the faces
