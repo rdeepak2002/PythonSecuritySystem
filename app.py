@@ -12,7 +12,7 @@ app = Flask(__name__)
 socketio = SocketIO(app, async_mode="threading")
 camera = Camera()
 
-FPS = 2
+FPS = 1
 
 @app.route('/')
 def index():
