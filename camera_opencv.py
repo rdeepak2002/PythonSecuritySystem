@@ -1,10 +1,12 @@
 import os
 import cv2
+import time
 from base_camera import BaseCamera
 
 
 class Camera(BaseCamera):
     video_source = 0
+    savedImagePath = os.getcwd() + '/saved/'
 
     def __init__(self):
         if os.environ.get('OPENCV_CAMERA_SOURCE'):
@@ -25,16 +27,25 @@ class Camera(BaseCamera):
 
         while True:
             # read current frame
-            _, img = camera.read()
+            try:
+                _, img = camera.read()
 
-            img = cv2.resize(img, (256, 144))
+                img = cv2.resize(img, (256, 144))
 
-            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            # Detect the faces
-            faces = face_cascade.detectMultiScale(gray, 1.4, 4)
-            # Draw the rectangle around each face
-            for (x, y, w, h) in faces:
-                cv2.rectangle(img, (x, y), (x+w, y+h), (255, 0, 0), 2)
+                imgName = str(round(time.time()))
 
-            # encode as a jpeg image and return it
-            yield cv2.imencode('.jpg', img)[1].tostring()
+                gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                # Detect the faces
+                faces = face_cascade.detectMultiScale(gray, 1.4, 4)
+                # Draw the rectangle around each face
+                for (x, y, w, h) in faces:
+                    cv2.rectangle(img, (x, y), (x+w, y+h), (255, 0, 0), 2)
+
+                status = cv2.imwrite(Camera.savedImagePath + imgName + '.jpg', img)
+
+                # encode as a jpeg image and return it
+                yield cv2.imencode('.jpg', img)[1].tostring()
+            except:
+                print('something went wrong')
+
+            
