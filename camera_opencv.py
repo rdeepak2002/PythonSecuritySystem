@@ -9,6 +9,7 @@ class Camera(BaseCamera):
     video_source = 0
     savedImagePath = os.getcwd() + '/saved/'
     font = cv2.FONT_HERSHEY_SIMPLEX
+    latestFile = ''
 
     def __init__(self):
         if os.environ.get('OPENCV_CAMERA_SOURCE'):
@@ -19,8 +20,8 @@ class Camera(BaseCamera):
     def set_video_source(source):
         Camera.video_source = source
 
-    @staticmethod
-    def frames():
+    @classmethod
+    def frames(self):
         camera = cv2.VideoCapture(Camera.video_source)
         if not camera.isOpened():
             raise RuntimeError('Could not start camera.')
@@ -36,9 +37,11 @@ class Camera(BaseCamera):
 
                 imgName = str(round(time.time()))
 
+                self.latestFile = imgName
+
                 currentDT = datetime.datetime.now()
 
-                cv2.putText(img,currentDT.strftime("%Y-%m-%d %H:%M:%S"),(10,20), Camera.font, 0.5,(255,255,255),2)
+                cv2.putText(img,currentDT.strftime("%Y-%m-%d %H:%M:%S"),(10,20), Camera.font, 0.5,(0,0,0),2)
 
                 # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
                 # Detect the faces

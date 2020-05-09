@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from importlib import import_module
 from flask import Flask, render_template, Response, send_from_directory
 from camera_opencv import Camera
@@ -53,7 +52,7 @@ def updateCamera():
 	initTime = time.time() * 1000
 	frame = camera.get_frame()
 	delay = time.time()*1000 - initTime + 0.01
-	socketio.emit('imageUpdate', {'image_data':frame, 'delay':delay})
+	socketio.emit('imageUpdate', {'image_data':frame, 'delay':delay, 'latestfile':camera.latestFile})
 	threading.Timer(1.0/FPS+(delay/1000), updateCamera).start()
 
 updateCamera()

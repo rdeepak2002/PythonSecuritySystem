@@ -3,72 +3,163 @@
 		<title>Socket Video Stream</title>
 	</head>
 	<body>
-
 		<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous">
 		</script>
 
+		<script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+
 		<h1>Deepak Security System</h1>
+
 		<p id='delay'></p>
 
 		<img id='image' width='50%'></img>
 
-		<img id='player'></img>
+		<img id='player' width='50%'></img>
+
+		<div id='sliderContainer'></div>
+
+		<button id='controlBtn'>Pause</button>
+
 
 		<script type='text/javascript' charset='utf-8'>
 			const socket = io()
+
+			const sliderContainer = document.getElementById('sliderContainer');
+			const imagePlayerElement = document.getElementById('player')
+			const controlBtn = document.getElementById('controlBtn')
+
+			let fileList = []
+			let min = 0
+			let max = 0
+			let slide = null
+			let latestImageData = null
+			let paused = false
+
+			controlBtn.onclick = function() {
+				if(paused) {
+					controlBtn.innerHTML = 'Pause'
+					paused = false
+					$('#sliderElement').prop({'value': max});
+				}
+				else {
+					controlBtn.innerHTML = 'Player'
+					paused = true
+				}
+			}
 
 			socket.on('connect', function() {
 				socket.emit('my event', {data: 'I\'m connected!'});
 			})
 
 			socket.on('after connect', function(filesIn) {
-				const files = filesIn
-				console.log(files)
+				fileList = filesIn.files.sort()
+
+				if(fileList.length > 0) {
+					imagePlayerElement.src = '/saved/' + fileList[0]
+				}
+
+				min = parseInt(fileList[0].substring(0, fileList[0].length-4))
+				max = parseInt(fileList[fileList.length-1].substring(0, fileList[fileList.length-1].length-4))
+
+				const slider = '<input type="range" min="' + min + '" max="' + max + '" value="' + max + '" class="slider" id="sliderElement" onchange="updateSlider(this.value)">'
+				sliderContainer.innerHTML = slider
+
+				slide = document.getElementById('sliderElement')
+
+				slide.onchange = function() {
+					paused = true
+					controlBtn.innerHTML = 'Play'
+
+					if(fileList.includes(this.value + '.jpg')) {
+						imagePlayerElement.src = '/saved/' + this.value + '.jpg'
+					}
+					else {
+						let closest1 = this.value
+						let closest2 = this.value
+
+						while(!fileList.includes(closest1 + '.jpg') && !fileList.includes(closest2 + '.jpg') && closest1 != min && closest2 != max) {
+							closest1 --
+							closest2 ++
+						}
+
+						let pos = closest1
+
+						if(!fileList.includes(closest1 + '.jpg')) {
+							pos = closest2
+						}
+
+						imagePlayerElement.src = '/saved/' + pos + '.jpg'
+					}
+				}
 			})
 
 			socket.on('imageUpdate', function(data) {
 				const imageData = data.image_data
 				const delay = data.delay
+				const latestFile = data.latestfile
 				const bytes = new Uint8Array(imageData)
 				const convertedData = "data:image/jpeg;base64,"+encode(bytes)
 				const imageElement = document.getElementById('image')
 				const delayElement = document.getElementById('delay')
 
-				delayElement.innerHTML = Math.round(delay) + " ms"
+				delayElement.innerHTML = Math.round(delay) + " ms of internal lag"
 
-				imageElement.src = convertedData
+				if(!fileList.includes(latestFile + '.jpg')) {
+					fileList.push(latestFile + '.jpg')
+					max = parseInt(latestFile)
+					if(slide != null) {
+						$('#sliderElement').prop({'max': max})
+					}
+				}
+
+				if(!paused) {
+					imagePlayerElement.src = convertedData
+				}				
 			})
 
 			function encode (input) {
-					const keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-					let output = "";
-					let chr1, chr2, chr3, enc1, enc2, enc3, enc4;
-					let i = 0;
+					const keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
+					let output = ""
+					let chr1, chr2, chr3, enc1, enc2, enc3, enc4
+					let i = 0
 
 					while (i < input.length) {
-							chr1 = input[i++];
-							chr2 = i < input.length ? input[i++] : Number.NaN; // Not sure if the index 
-							chr3 = i < input.length ? input[i++] : Number.NaN; // checks are needed here
+							chr1 = input[i++]
+							chr2 = i < input.length ? input[i++] : Number.NaN // Not sure if the index 
+							chr3 = i < input.length ? input[i++] : Number.NaN // checks are needed here
 
-							enc1 = chr1 >> 2;
-							enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
-							enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
-							enc4 = chr3 & 63;
+							enc1 = chr1 >> 2
+							enc2 = ((chr1 & 3) << 4) | (chr2 >> 4)
+							enc3 = ((chr2 & 15) << 2) | (chr3 >> 6)
+							enc4 = chr3 & 63
 
 							if (isNaN(chr2)) {
-								enc3 = enc4 = 64;
+								enc3 = enc4 = 64
 							} 
 							else if (isNaN(chr3)) {
-								enc4 = 64;
+								enc4 = 64
 							}
 
-							output += keyStr.charAt(enc1) + keyStr.charAt(enc2) + keyStr.charAt(enc3) + keyStr.charAt(enc4);
+							output += keyStr.charAt(enc1) + keyStr.charAt(enc2) + keyStr.charAt(enc3) + keyStr.charAt(enc4)
 					}
-					return output;
+					return output
+			}
+		</script>
+
+		<style>
+			#image {
+				display: block;
 			}
 
+			#player {
+				display: block;
+			}
 
-		</script>
+			#sliderContainer {
+				display: block;
+			}
+
+		</style>
 
 	</body>
 </html>
