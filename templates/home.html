@@ -11,6 +11,7 @@
 		<h1>Deepak Security System</h1>
 
 		<p id='delay'></p>
+		<p id='storage'></p>
 
 		<img id='image' width='50%'></img>
 
@@ -80,6 +81,7 @@
 				const convertedData = "data:image/jpeg;base64,"+encode(bytes)
 				const imageElement = document.getElementById('image')
 				const delayElement = document.getElementById('delay')
+				const storageElement = document.getElementById('storage')
 
 				delayElement.innerHTML = Math.round(delay) + " ms of internal lag"
 
@@ -88,6 +90,16 @@
 					max = parseInt(latestFile)
 					if(slide != null) {
 						$('#sliderElement').prop({'max': max})
+					}
+
+					const size = fileList.length*15.3*0.001
+
+					if(size < 1000) {
+						storageElement.innerHTML = size.toFixed(2) + " mb"
+					}
+					else {
+						size = size*0.001
+						storageElement.innerHTML = size.toFixed(2) + " gb"
 					}
 				}
 
