@@ -34,12 +34,12 @@ class Camera(BaseCamera):
 
                 imgName = str(round(time.time()))
 
-                gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
                 # Detect the faces
-                faces = face_cascade.detectMultiScale(gray, 1.4, 4)
+                # faces = face_cascade.detectMultiScale(gray, 1.4, 4)
                 # Draw the rectangle around each face
-                for (x, y, w, h) in faces:
-                    cv2.rectangle(img, (x, y), (x+w, y+h), (255, 0, 0), 2)
+                # for (x, y, w, h) in faces:
+                #     cv2.rectangle(img, (x, y), (x+w, y+h), (255, 0, 0), 2)
 
                 status = cv2.imwrite(Camera.savedImagePath + imgName + '.jpg', img)
 
