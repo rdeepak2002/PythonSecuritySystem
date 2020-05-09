@@ -35,7 +35,7 @@ class Camera(BaseCamera):
 
                 img = cv2.resize(img, (256, 144))
 
-                imgName = str(round(time.time()))
+                imgName = str(round(time.time()*10))
 
                 self.latestFile = imgName
 

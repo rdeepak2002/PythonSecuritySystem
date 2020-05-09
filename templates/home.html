@@ -31,18 +31,17 @@
 			let fileList = []
 			let min = 0
 			let max = 0
-			let slide = null
-			let latestImageData = null
+			let slide = undefined
+			let latestImageData = undefined
 			let paused = false
 
 			controlBtn.onclick = function() {
 				if(paused) {
 					controlBtn.innerHTML = 'Pause'
 					paused = false
-					$('#sliderElement').prop({'value': max});
 				}
 				else {
-					controlBtn.innerHTML = 'Player'
+					controlBtn.innerHTML = 'Play'
 					paused = true
 				}
 			}
@@ -69,29 +68,11 @@
 				slide.onchange = function() {
 					paused = true
 					controlBtn.innerHTML = 'Play'
-
-					if(fileList.includes(this.value + '.jpg')) {
-						imagePlayerElement.src = '/saved/' + this.value + '.jpg'
-					}
-					else {
-						let closest1 = this.value
-						let closest2 = this.value
-
-						while(!fileList.includes(closest1 + '.jpg') && !fileList.includes(closest2 + '.jpg') && closest1 != min && closest2 != max) {
-							closest1 --
-							closest2 ++
-						}
-
-						let pos = closest1
-
-						if(!fileList.includes(closest1 + '.jpg')) {
-							pos = closest2
-						}
-
-						imagePlayerElement.src = '/saved/' + pos + '.jpg'
-					}
+					sliderChanged(this.value)
 				}
 			})
+
+
 
 			socket.on('imageUpdate', function(data) {
 				const imageData = data.image_data
@@ -113,9 +94,41 @@
 				}
 
 				if(!paused) {
-					imagePlayerElement.src = convertedData
-				}				
+					if(slide != undefined && slide.value != undefined) {
+						$('#sliderElement').prop({'value': slide.value+10})
+						if(slide.value > latestFile) {
+							$('#sliderElement').prop({'value': latestFile})
+						}
+						sliderChanged(slide.value)
+					}
+				}
 			})
+
+			function sliderChanged(sliderValue) {
+				if(fileList.includes(sliderValue + '.jpg')) {
+					imagePlayerElement.src = '/saved/' + sliderValue + '.jpg'
+					$('#sliderElement').prop({'value': sliderValue})
+				}
+				else {
+					let closest1 = sliderValue
+					let closest2 = sliderValue
+
+					while(!fileList.includes(closest1 + '.jpg') && !fileList.includes(closest2 + '.jpg') && closest1 != min && closest2 != max) {
+						closest1 --
+						closest2 ++
+					}
+
+					let pos = closest1
+
+					if(!fileList.includes(closest1 + '.jpg')) {
+						pos = closest2
+					}
+
+					imagePlayerElement.src = '/saved/' + pos + '.jpg'
+
+					$('#sliderElement').prop({'value': pos})
+				}
+			}
 
 			function encode (input) {
 					const keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
