@@ -52,7 +52,7 @@ def getListOfFiles():
 def updateCamera():
 	initTime = time.time() * 1000
 	frame = camera.get_frame()
-	delay = time.time()*1000 - initTime
+	delay = time.time()*1000 - initTime + 0.01
 	socketio.emit('imageUpdate', {'image_data':frame, 'delay':delay})
 	threading.Timer(1.0/FPS+(delay/1000), updateCamera).start()
 
