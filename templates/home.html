@@ -92,15 +92,16 @@
 				}
 
 				if(!paused) {
-					if(slide != undefined && slide.value != undefined) {
-						$('#sliderElement').prop({'value': slide.value+10})
+					imagePlayerElement.src = convertedData
+					// if(slide != undefined && slide.value != undefined) {
+					// 	$('#sliderElement').prop({'value': slide.value+10})
 
-						if(slide.value > latestFile) {
-							$('#sliderElement').prop({'value': latestFile})
-						}
-						
-						sliderChanged(slide.value)
-					}
+					// 	if(slide.value > latestFile) {
+					// 		$('#sliderElement').prop({'value': latestFile})
+					// 	}
+
+					// 	sliderChanged(slide.value)
+					// }
 				}
 			})
 
@@ -123,6 +124,8 @@
 					if(!fileList.includes(closest1 + '.jpg')) {
 						pos = closest2
 					}
+
+					console.log(pos)
 
 					imagePlayerElement.src = '/saved/' + pos + '.jpg'
 

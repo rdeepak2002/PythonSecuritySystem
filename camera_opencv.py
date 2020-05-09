@@ -12,6 +12,13 @@ class Camera(BaseCamera):
     latestFile = ''
 
     def __init__(self):
+        try:
+            os.mkdir(Camera.savedImagePath)
+        except OSError:
+            print ("Creation of the directory %s failed" % Camera.savedImagePath)
+        else:
+            print ("Successfully created the directory %s " % Camera.savedImagePath)
+
         if os.environ.get('OPENCV_CAMERA_SOURCE'):
             Camera.set_video_source(int(os.environ['OPENCV_CAMERA_SOURCE']))
         super(Camera, self).__init__()
@@ -35,7 +42,7 @@ class Camera(BaseCamera):
 
                 img = cv2.resize(img, (256, 144))
 
-                imgName = str(round(time.time()*10))
+                imgName = str(round(time.time()))
 
                 self.latestFile = imgName
 
