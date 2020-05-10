@@ -21,6 +21,7 @@
 
 		<button id='controlBtn'>Pause</button>
 
+		<div id='debugLog'></div>
 
 		<script type='text/javascript' charset='utf-8'>
 			const socket = io()
@@ -28,6 +29,7 @@
 			const sliderContainer = document.getElementById('sliderContainer');
 			const imagePlayerElement = document.getElementById('player')
 			const controlBtn = document.getElementById('controlBtn')
+			const debugLog = document.getElementById('debugLog')
 
 			let fileList = []
 			let min = 0
@@ -35,6 +37,8 @@
 			let slide = undefined
 			let latestImageData = undefined
 			let paused = false
+
+			debugAdd('connecting to server')
 
 			controlBtn.onclick = function() {
 				if(paused) {
@@ -48,7 +52,8 @@
 			}
 
 			socket.on('connect', function() {
-				socket.emit('my event', {data: 'I\'m connected!'});
+				socket.emit('my event', {data: 'I\'m connected!'})
+				debugAdd('connected to server')
 			})
 
 			socket.on('after connect', function(filesIn) {
@@ -163,6 +168,10 @@
 							output += keyStr.charAt(enc1) + keyStr.charAt(enc2) + keyStr.charAt(enc3) + keyStr.charAt(enc4)
 					}
 					return output
+			}
+
+			function debugAdd(text) {
+				$('#debugLog').append('<div>'+text+'</div>');
 			}
 		</script>
 

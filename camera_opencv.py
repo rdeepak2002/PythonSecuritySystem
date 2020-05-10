@@ -4,7 +4,6 @@ import time
 import datetime
 from base_camera import BaseCamera
 
-
 class Camera(BaseCamera):
     video_source = 0
     savedImagePath = os.getcwd() + '/saved/'
