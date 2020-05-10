@@ -24,8 +24,9 @@
 		<div id='debugLog'></div>
 
 		<script type='text/javascript' charset='utf-8'>
-			const socket = io()
+			debugAdd('script started')
 
+			const socket = io()
 			const sliderContainer = document.getElementById('sliderContainer');
 			const imagePlayerElement = document.getElementById('player')
 			const controlBtn = document.getElementById('controlBtn')
@@ -63,6 +64,8 @@
 					imagePlayerElement.src = '/saved/' + fileList[0]
 				}
 
+				debugAdd('file list of size ' + fileList.length + ' retrieved')
+
 				min = parseInt(fileList[0].substring(0, fileList[0].length-4))
 				max = parseInt(fileList[fileList.length-1].substring(0, fileList[fileList.length-1].length-4))
 
@@ -97,7 +100,7 @@
 						$('#sliderElement').prop({'max': max})
 					}
 
-					const size = fileList.length*15.3*0.001
+					let size = fileList.length*15.3*0.001
 
 					if(size < 1000) {
 						storageElement.innerHTML = size.toFixed(2) + " mb"
@@ -115,6 +118,8 @@
 			})
 
 			function sliderChanged(sliderValue) {
+				debugAdd('slider changed function called')
+
 				if(fileList.includes(sliderValue + '.jpg')) {
 					imagePlayerElement.src = '/saved/' + sliderValue + '.jpg'
 					$('#sliderElement').prop({'value': sliderValue})
